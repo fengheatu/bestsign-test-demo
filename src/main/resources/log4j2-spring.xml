@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--status : 这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,会看到log4j2内部各种详细输出
+monitorInterval : Log4j能够自动检测修改配置文件和重新配置本身, 设置间隔秒数。 -->
+<configuration status="warn" monitorInterval="600">
+
+    <properties>
+        <!-- 配置日志文件输出目录 -->
+        <property name="LOG_HOME">/data/weblogs/fund.iou.customer.ui</property>
+        <property name="FILE_NAME_ERROR">Error</property>
+        <property name="FILE_NAME_APPLICATION">Application</property>
+    </properties>
+
+    <Appenders>
+        <!-- 配置日志文件输出目录 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!-- 输出日志的格式 -->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"/>
+        </Console>
+
+
+        <!--fileName  指定当前日志文件的位置和文件名称   filePattern  指定当发生Rolling时，文件的转移和重命名规则-->
+        <!--<RollingRandomAccessFile name="error" append="true"
+                                 fileName="${LOG_HOME}/${FILE_NAME_ERROR}.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME_ERROR}/${FILE_NAME_ERROR}-%d{yyyy-MM-dd}-%i.log">
+            <PatternLayout charset="UTF-8"
+                           pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"/>
+            <Policies>
+                &lt;!&ndash;和filePattern结合使用，注意filePattern中配置的文件重命名规则是${FILE_NAME}-%d{yyyy-MM-dd
+                HH-mm}-%i，最小的时间粒度是mm，即分钟，TimeBasedTriggeringPolicy指定的size是1，结合起来就是每1分钟生成一个新文件。如果改成%d{yyyy-MM-dd
+                HH}，最小粒度为小时，则每一个小时生成一个文件。modulate:Indicates whether the interval should be adjusted to cause the next rollover to
+                occur on the interval boundary.&ndash;&gt;
+                <TimeBasedTriggeringPolicy interval="1" />
+                &lt;!&ndash;指定当文件体积大于size指定的值时，触发Rolling&ndash;&gt;
+                <SizeBasedTriggeringPolicy size="200 MB"/>
+            </Policies>
+            &lt;!&ndash;指定最多保存的文件数  （指-%i 一个间隔最多文件数）&ndash;&gt;
+            &lt;!&ndash;<DefaultRolloverStrategy max="20"/>&ndash;&gt;
+        </RollingRandomAccessFile>-->
+
+        <!-- application.log -->
+        <RollingRandomAccessFile name="application"
+                                 fileName="${LOG_HOME}/${FILE_NAME_APPLICATION}.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME_APPLICATION}.%d{yyyy-MM-dd}.log">
+            <PatternLayout charset="UTF-8"
+                           pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"/>
+            <!-- 可以通过该参数来设置获取日志的权限 -->
+            <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" />
+                <SizeBasedTriggeringPolicy size="200 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+        <!-- error.log -->
+        <RollingRandomAccessFile name="error"
+                                 fileName="${LOG_HOME}/${FILE_NAME_ERROR}.log"
+                                 filePattern="${LOG_HOME}/${FILE_NAME_ERROR}.%d{yyyy-MM-dd}.%i.log">
+            <PatternLayout charset="UTF-8"
+                           pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{50} - %msg%n"/>
+            <!-- 可以通过该参数来设置获取日志的权限 -->
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" />
+                <SizeBasedTriggeringPolicy size="200 MB"/>
+            </Policies>
+        </RollingRandomAccessFile>
+
+    </Appenders>
+
+    <Loggers>
+        <!--additivity="false"表示在该logger中输出的日志不会再延伸到父层logger additivity="false"表示在该logger中输出的日志不会再延伸到父层logger
+        日志级别从低到高分为TRACE < DEBUG  < INFO  < WARN  < ERROR  < FATAL，如果设置为WARN，则低于WARN的信息都不会输出。-->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="error"/>
+            <AppenderRef ref="application"/>
+        </Root>
+    </Loggers>
+</configuration>
